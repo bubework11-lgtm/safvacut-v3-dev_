@@ -1,0 +1,13 @@
+{
+  "name": "safvacut-wallet",
+  "version": "1.0.0",
+  "description": "Safvacut - Cryptocurrency Wallet & Trading Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["cryptocurrency", "wallet", "trading", "blockchain"],
+  "author": "",
+  "license": "ISC"
+}
