@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>Safvacut Admin - Login</title>
+    <meta name="title" content="Safvacut - Your Trusted Cryptocurrency Wallet & Trading Platform">
+    <meta name="description"
+        content="Join over 2.5M users worldwide. Secure crypto wallet with bank-level security, instant trading, and your own crypto debit card. Start your crypto journey today.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Favicon -->
+    <link rel="shortcut icon"
+        href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-ESKwzmjR7tbreApAoFqaXonObbk7qV.png"
+        type="image/png">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-card {
+            backdrop-filter: blur(20px);
+            background: rgba(15, 15, 35, 0.9);
+            border: 1px solid rgba(247, 147, 30, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, #f7931e 0%, #ff6b35 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(247, 147, 30, 0.4);
+        }
+
+        .btn-admin:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .input-admin {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(247, 147, 30, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .input-admin:focus {
+            border-color: #f7931e;
+            box-shadow: 0 0 0 2px rgba(247, 147, 30, 0.2);
+            outline: none;
+        }
+
+        .input-admin::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 640px) {
+            .admin-card {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="admin-card rounded-2xl p-6 sm:p-8 w-full max-w-md">
+        <div class="text-center mb-6 sm:mb-8">
+            <div
+                class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-shield-alt text-white text-xl sm:text-2xl"></i>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white mb-2">Admin Access</h1>
+            <p class="text-sm sm:text-base text-gray-400">Safvacut Dashboard Administration</p>
+        </div>
+
+        <form id="admin-login-form" class="space-y-4 sm:space-y-6">
+            <div>
+                <label for="admin-username" class="block text-sm font-medium text-gray-300 mb-2">
+                    <i class="fas fa-user mr-2"></i>Username
+                </label>
+                <input type="text" id="admin-username"
+                    class="input-admin w-full p-3 sm:p-4 rounded-lg text-sm sm:text-base"
+                    placeholder="Enter admin username" required>
+            </div>
+
+            <div>
+                <label for="admin-password" class="block text-sm font-medium text-gray-300 mb-2">
+                    <i class="fas fa-lock mr-2"></i>Password
+                </label>
+                <div class="relative">
+                    <input type="password" id="admin-password"
+                        class="input-admin w-full p-3 sm:p-4 rounded-lg pr-12 text-sm sm:text-base"
+                        placeholder="Enter admin password" required>
+                    <button type="button" id="toggle-password"
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white p-2">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="btn-admin w-full py-3 sm:py-4 rounded-lg text-white font-semibold text-sm sm:text-base"
+                id="login-btn">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Access Dashboard
+            </button>
+        </form>
+
+        <div class="mt-4 sm:mt-6 text-center">
+            <p class="text-xs text-gray-500">
+                <i class="fas fa-info-circle mr-1"></i>
+                Authorized personnel only
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Admin credentials
+        const ADMIN_CREDENTIALS = {
+            username: 'safvacut_admin',
+            password: 'SafvaCut2024!Admin'
+        };
+
+        // Firebase Config
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6enbTO-nNYVyrNLRP-Av6ghguL3--Nvw",
+            authDomain: "safvacut-web-wallet.firebaseapp.com",
+            projectId: "safvacut-web-wallet",
+            storageBucket: "safvacut-web-wallet.appspot.com",
+            messagingSenderId: "976916444641",
+            appId: "1:976916444641:web:4c6a6ad09c43a7ccda0ea0",
+            measurementId: "G-0QCL2TQCB6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        // Check if already logged in
+        const adminSession = localStorage.getItem('safvacut_admin_session');
+        const sessionTime = localStorage.getItem('safvacut_admin_time');
+
+        if (adminSession && sessionTime) {
+            const timeDiff = Date.now() - parseInt(sessionTime);
+            if (timeDiff < 3600000) { // 1 hour session
+                window.location.href = 'admin-dashboard.html';
+            }
+        }
+
+        // Toggle password visibility
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const passwordInput = document.getElementById('admin-password');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Handle login
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('admin-username').value.trim();
+            const password = document.getElementById('admin-password').value;
+            const loginBtn = document.getElementById('login-btn');
+
+            if (!username || !password) {
+                await Swal.fire({
+                    title: 'Missing Information',
+                    text: 'Please enter both username and password',
+                    icon: 'warning',
+                    confirmButtonColor: '#f7931a',
+                    background: 'rgba(15, 15, 35, 0.9)',
+                    color: '#ffffff'
+                });
+                return;
+            }
+
+            // Show loading
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Authenticating...';
+            loginBtn.disabled = true;
+
+            try {
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Validate credentials
+                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    // Store admin session
+                    localStorage.setItem('safvacut_admin_session', 'authenticated');
+                    localStorage.setItem('safvacut_admin_time', Date.now().toString());
+                    localStorage.setItem('safvacut_admin_user', username);
+
+                    // Success message
+                    await Swal.fire({
+                        title: 'Access Granted',
+                        text: 'Welcome to Safvacut Admin Dashboard',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        background: 'rgba(15, 15, 35, 0.9)',
+                        color: '#ffffff'
+                    });
+
+                    // Redirect to dashboard
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    throw new Error('Invalid credentials');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+
+                await Swal.fire({
+                    title: 'Access Denied',
+                    text: 'Invalid username or password',
+                    icon: 'error',
+                    confirmButtonColor: '#f7931a',
+                    background: 'rgba(15, 15, 35, 0.9)',
+                    color: '#ffffff'
+                });
+
+                // Reset form
+                document.getElementById('admin-password').value = '';
+            } finally {
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Access Dashboard';
+                loginBtn.disabled = false;
+            }
+        });
+
+        // Security: Clear any existing user sessions
+        localStorage.removeItem('safvacut_user');
+        localStorage.removeItem('safvacut_auth_time');
+    </script>
+</body>
+
+</html>
