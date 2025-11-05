@@ -12,7 +12,7 @@ import { Withdraw } from './components/wallet/Withdraw'
 import { AdminPanel } from './components/admin/AdminPanel'
 import { UserList } from './components/admin/UserList'
 import { TransactionHistory } from './components/wallet/TransactionHistory'
-import { ErrorBoundary } from './components/ErrorBoundary'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useUser()
