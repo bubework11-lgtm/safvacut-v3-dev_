@@ -8,6 +8,8 @@ import { BiometricLogin } from './components/auth/BiometricLogin'
 import { Dashboard } from './components/dashboard/Dashboard'
 import { Deposit } from './components/wallet/Deposit'
 import { Withdraw } from './components/wallet/Withdraw'
+import { AdminPanel } from './components/admin/AdminPanel'
+import { UserList } from './components/admin/UserList'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useUser()
@@ -25,6 +27,31 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />
+  }
+
+  return <>{children}</>
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading, isAdmin } = useUser()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />
   }
 
   return <>{children}</>
@@ -71,6 +98,22 @@ function App() {
             <ProtectedRoute>
               <Withdraw />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <UserList />
+            </AdminRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
