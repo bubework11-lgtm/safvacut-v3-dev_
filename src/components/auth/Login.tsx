@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
 
@@ -6,6 +7,7 @@ export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -19,6 +21,7 @@ export function Login() {
 
       if (error) throw error
       toast.success('Logged in successfully!')
+      navigate('/dashboard')
     } catch (error: any) {
       toast.error(error.message || 'Failed to log in')
     } finally {

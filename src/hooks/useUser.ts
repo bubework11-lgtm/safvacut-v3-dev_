@@ -57,7 +57,21 @@ export function useUser() {
         .eq('id', user.id)
         .single()
 
-      if (profileError) throw profileError
+      let finalProfile = profile
+
+      // If profile doesn't exist, create it
+      if (profileError && profileError.code === 'PGRST116') {
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([{ id: user.id, email: user.email }])
+          .select()
+          .single()
+
+        if (createError) throw createError
+        finalProfile = newProfile
+      } else if (profileError) {
+        throw profileError
+      }
 
       // Check if admin
       const { data: adminData } = await supabase
@@ -68,7 +82,7 @@ export function useUser() {
 
       setUserData({
         user,
-        profile,
+        profile: finalProfile,
         loading: false,
         isAdmin: !!adminData,
       })

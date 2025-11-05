@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { toast } from 'sonner'
 
@@ -7,6 +8,7 @@ export function Signup() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
@@ -31,16 +33,8 @@ export function Signup() {
 
       if (error) throw error
 
-      if (data.user) {
-        // Create profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{ id: data.user.id, email }])
-
-        if (profileError) throw profileError
-      }
-
       toast.success('Account created! Please check your email to verify.')
+      navigate('/dashboard')
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign up')
     } finally {
