@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { useUser } from './hooks/useUser'
+import { useRealtimeNotifications } from './hooks/useRealtimeNotifications'
 import { Login } from './components/auth/Login'
 import { Signup } from './components/auth/Signup'
 import { OnboardingCarousel } from './components/OnboardingCarousel'
@@ -69,9 +70,12 @@ function LoginWithBiometric() {
 }
 
 function App() {
+  const { user } = useUser()
+  useRealtimeNotifications(user?.id)
+
   return (
     <BrowserRouter>
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" richColors expand={true} />
       <Routes>
         <Route path="/" element={<OnboardingCarousel />} />
         <Route path="/login" element={<LoginWithBiometric />} />
