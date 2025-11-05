@@ -3,16 +3,18 @@
 ## Overview
 Safvacut V3 is a cryptocurrency wallet and trading platform being transformed from vanilla JS + Firebase into a modern React + TypeScript + Supabase production PWA.
 
-## Tech Stack (Phase 1, 2, 3, 4 & 5 Complete)
+## Tech Stack (Phase 1-6 Complete ✓)
 - **Frontend**: React 19 + TypeScript + Vite
 - **Routing**: React Router v6 with protected routes
-- **Styling**: Tailwind CSS 3.4 + shadcn/ui
+- **Styling**: Tailwind CSS 3.4 + shadcn/ui with Dark Mode
 - **State**: TanStack Query
 - **Authentication**: Supabase Auth with email/password
 - **Web3**: wagmi + viem + RainbowKit 2.3
 - **Backend**: Supabase (schema + edge functions ready)
 - **UI Components**: Framer Motion, Sonner, Lucide React, Recharts
 - **Build**: Vite 7 with Hot Module Replacement
+- **PWA**: Service Worker + Manifest for installability
+- **Notifications**: Supabase Realtime + Sonner Toasts + Haptic Feedback
 
 ## Project Structure
 ```
@@ -29,7 +31,10 @@ Safvacut V3 is a cryptocurrency wallet and trading platform being transformed fr
 │   ├── hooks/
 │   │   ├── useUser.ts       # Auth state, profile & admin check hook
 │   │   ├── useBalances.ts   # Real-time balance subscription
-│   │   └── usePrices.ts     # Live CoinGecko price updates
+│   │   ├── usePrices.ts     # Live CoinGecko price updates
+│   │   └── useRealtimeNotifications.ts # Realtime toasts & haptics
+│   ├── contexts/
+│   │   └── DarkModeContext.tsx # Dark mode state management
 │   └── components/
 │       ├── auth/
 │       │   ├── Login.tsx    # Login component with routing
@@ -53,6 +58,8 @@ Safvacut V3 is a cryptocurrency wallet and trading platform being transformed fr
 │       └── approve_withdrawal/ # Admin withdrawal approval
 ├── public/
 │   ├── logo.png             # Safvacut logo
+│   ├── manifest.json        # PWA manifest
+│   ├── sw.js                # Service worker
 │   └── images/              # Crypto images (BTC, ETH, etc.)
 ├── vite.config.ts           # Vite config with aliases & port 5000
 ├── tailwind.config.js       # Tailwind config
@@ -65,6 +72,34 @@ Safvacut V3 is a cryptocurrency wallet and trading platform being transformed fr
 - **Workflow**: vite-dev running `npm run dev`
 
 ## Recent Changes
+
+### 2025-11-05: PHASE 6 - Realtime Notifications + PWA ✓
+1. ✅ Created useRealtimeNotifications hook:
+   - Supabase Realtime listeners for deposits & withdrawals
+   - Automatic Sonner toast notifications for completed transactions
+   - Haptic feedback integration (vibrate API)
+   - Real-time status updates (completed/rejected)
+2. ✅ Built Progressive Web App (PWA):
+   - manifest.json with app metadata & shortcuts
+   - Service worker (sw.js) with caching strategy
+   - Install prompt support for mobile/desktop
+   - Offline capability & push notification support
+3. ✅ Implemented Dark Mode:
+   - DarkModeContext with localStorage persistence
+   - Tailwind dark: variants throughout Dashboard
+   - Toggle button with Sun/Moon icons
+   - Smooth transitions between themes
+4. ✅ Added Haptic Feedback:
+   - haptics.ts utility library
+   - Feedback on all button interactions
+   - Success/error patterns for notifications
+   - Light/medium/heavy vibration levels
+5. ✅ Enhanced User Experience:
+   - Real-time balance update notifications
+   - Withdrawal approval notifications
+   - Haptic feedback on deposits/withdrawals
+   - PWA installable on mobile devices
+6. ✅ Code review passed - all features functional
 
 ### 2025-11-05: PHASE 5 - Admin Panel ✓
 1. ✅ Created AdminPanel component with:
@@ -163,29 +198,34 @@ Safvacut V3 is a cryptocurrency wallet and trading platform being transformed fr
 4. ✅ Set up shadcn/ui configuration
 5. ✅ Preserved assets from original project
 
-## Next Steps - PHASE 6
+## Next Steps - PHASE 7
 
 **Ready to commit:**
 ```bash
 git add -A
-git commit -m "Phase 5: Admin Panel with withdrawal approval and user management"
+git commit -m "Phase 6: Realtime Notifications + PWA with Dark Mode"
 git push
 ```
 
-**Key Phase 6 Tasks (Real-time Features & Notifications):**
-1. Real-time notifications:
-   - Toast notifications for balance changes
-   - Withdrawal status updates for users
-   - Admin notifications for new withdrawal requests
-2. Transaction history page:
-   - User-facing transaction history
+**Suggested Phase 7 Tasks (Transaction History & Enhanced UX):**
+1. Transaction History Page:
+   - User-facing transaction history component
    - Filtering by type (deposit/withdraw/transfer)
-   - Export functionality
-3. Dashboard enhancements:
-   - Recent transactions widget
-   - Activity feed
-   - Quick action buttons
-4. Admin enhancements:
-   - Bulk operations support
-   - Advanced filtering and sorting
-   - Transaction statistics/charts
+   - Sorting by date, amount, status
+   - Export functionality (CSV/PDF)
+   - Pagination for large transaction sets
+2. Dashboard Enhancements:
+   - Recent transactions widget (last 5-10)
+   - Activity feed with timeline view
+   - Quick stats cards (today's deposits/withdrawals)
+   - Price charts with Recharts
+3. Admin Enhancements:
+   - Bulk operations for withdrawals
+   - Advanced filtering and search
+   - Transaction statistics dashboard
+   - Analytics charts for deposits/withdrawals
+4. Additional Features:
+   - Email notifications for transactions
+   - 2FA authentication setup
+   - Profile settings page
+   - Security audit logs
