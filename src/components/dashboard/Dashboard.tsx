@@ -1,60 +1,71 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useUser } from '../../hooks/useUser'
-import { useBalances } from '../../hooks/useBalances'
-import { usePrices } from '../../hooks/usePrices'
-import { useDarkMode } from '../../contexts/DarkModeContext'
-import { SUPPORTED_TOKENS } from '../../types/database'
-import { motion } from 'framer-motion'
-import { ArrowUpRight, ArrowDownLeft, RefreshCw, LogOut, Moon, Sun, Copy, QrCode, X, History } from 'lucide-react'
-import { QRCodeSVG } from 'qrcode.react'
-import { supabase } from '../../lib/supabase'
-import { haptics } from '../../lib/haptics'
-import { toast } from 'sonner'
-import { DashboardSkeleton } from '../ui/SkeletonLoader'
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
+import { useBalances } from "../../hooks/useBalances";
+import { usePrices } from "../../hooks/usePrices";
+import { useDarkMode } from "../../contexts/DarkModeContext";
+import { SUPPORTED_TOKENS } from "../../types/database";
+import { motion } from "framer-motion";
+import {
+  ArrowUpRight,
+  ArrowDownLeft,
+  RefreshCw,
+  LogOut,
+  Moon,
+  Sun,
+  Copy,
+  QrCode,
+  X,
+  History,
+} from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { supabase } from "../../lib/supabase";
+import { haptics } from "../../lib/haptics";
+import { toast } from "sonner";
+import { DashboardSkeleton } from "../ui/SkeletonLoader";
 
 export function Dashboard() {
-  const { user, profile, isAdmin } = useUser()
-  const { balances, loading: balancesLoading } = useBalances(user?.id)
-  const { prices, loading: pricesLoading } = usePrices()
-  const { darkMode, toggleDarkMode } = useDarkMode()
-  const [showQR, setShowQR] = useState(false)
+  const { user, profile, isAdmin } = useUser();
+  const { balances, loading: balancesLoading } = useBalances(user?.id ?? "");
+  const { prices, loading: pricesLoading } = usePrices();
+  const { darkMode, toggleDarkMode } = useDarkMode();
+  const [showQR, setShowQR] = useState(false);
 
   const getBalance = (token: string) => {
-    const balance = balances.find((b) => b.token === token)
-    return balance ? parseFloat(balance.amount) : 0
-  }
+    const balance = balances.find((b) => b.token === token);
+    return balance ? parseFloat(balance.amount) : 0;
+  };
 
   const getUsdValue = (token: string, amount: number) => {
-    const price = prices[token]?.usd || 0
-    return amount * price
-  }
+    const price = prices[token]?.usd || 0;
+    return amount * price;
+  };
 
   const totalUsd = SUPPORTED_TOKENS.reduce((sum, token) => {
-    const amount = getBalance(token)
-    return sum + getUsdValue(token, amount)
-  }, 0)
+    const amount = getBalance(token);
+    return sum + getUsdValue(token, amount);
+  }, 0);
 
   const handleSignOut = async () => {
-    haptics.medium()
-    await supabase.auth.signOut()
-  }
+    haptics.medium();
+    await supabase.auth.signOut();
+  };
 
   const handleCopyUID = () => {
     if (profile?.uid) {
-      navigator.clipboard.writeText(profile.uid)
-      toast.success('UID copied to clipboard!')
-      haptics.light()
+      navigator.clipboard.writeText(profile.uid);
+      toast.success("UID copied to clipboard!");
+      haptics.light();
     }
-  }
+  };
 
   const handleShowQR = () => {
-    setShowQR(true)
-    haptics.light()
-  }
+    setShowQR(true);
+    haptics.light();
+  };
 
   if (!profile) {
-    return <DashboardSkeleton />
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -62,7 +73,11 @@ export function Dashboard() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Safvacut" className="w-12 h-12 rounded-full" />
+            <img
+              src="/logo.png"
+              alt="Safvacut"
+              className="w-12 h-12 rounded-full"
+            />
             <div>
               <h1 className="text-2xl font-bold">Safvacut V3</h1>
               <div className="flex items-center gap-2">
@@ -89,13 +104,17 @@ export function Dashboard() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                haptics.light()
-                toggleDarkMode()
+                haptics.light();
+                toggleDarkMode();
               }}
               className="p-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors"
               aria-label="Toggle dark mode"
             >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {darkMode ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
             </button>
             <button
               onClick={handleSignOut}
@@ -109,7 +128,9 @@ export function Dashboard() {
 
         {isAdmin && (
           <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-6">
-            <p className="text-orange-600 dark:text-orange-400 font-semibold">🔑 Admin Panel Access</p>
+            <p className="text-orange-600 dark:text-orange-400 font-semibold">
+              🔑 Admin Panel Access
+            </p>
           </div>
         )}
 
@@ -124,7 +145,11 @@ export function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               key={totalUsd}
             >
-              ${totalUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              $
+              {totalUsd.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </motion.h2>
           )}
         </div>
@@ -172,9 +197,9 @@ export function Dashboard() {
 
           <div className="space-y-3">
             {SUPPORTED_TOKENS.map((token) => {
-              const amount = getBalance(token)
-              const usdValue = getUsdValue(token, amount)
-              const price = prices[token]?.usd || 0
+              const amount = getBalance(token);
+              const usdValue = getUsdValue(token, amount);
+              const price = prices[token]?.usd || 0;
 
               return (
                 <div
@@ -191,7 +216,10 @@ export function Dashboard() {
                         <div className="h-4 w-16 bg-gray-700 rounded animate-pulse mt-1"></div>
                       ) : (
                         <p className="text-sm text-gray-400">
-                          ${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          $
+                          {price.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                          })}
                         </p>
                       )}
                     </div>
@@ -210,13 +238,17 @@ export function Dashboard() {
                           {amount.toFixed(8)} {token}
                         </motion.p>
                         <p className="text-sm text-gray-400">
-                          ${usdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          $
+                          {usdValue.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                         </p>
                       </>
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -234,7 +266,7 @@ export function Dashboard() {
       </div>
 
       {showQR && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setShowQR(false)}
         >
@@ -250,26 +282,28 @@ export function Dashboard() {
             >
               <X className="w-5 h-5" />
             </button>
-            
+
             <h2 className="text-2xl font-bold mb-2">Profile QR Code</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               Share this QR code for your profile UID
             </p>
-            
+
             <div className="bg-white p-6 rounded-xl flex items-center justify-center mb-4">
-              <QRCodeSVG 
+              <QRCodeSVG
                 value={profile.uid}
                 size={200}
                 level="H"
                 includeMargin={true}
               />
             </div>
-            
+
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Your UID</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                Your UID
+              </p>
               <p className="font-mono font-bold text-lg">{profile.uid}</p>
             </div>
-            
+
             <button
               onClick={handleCopyUID}
               className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
@@ -281,5 +315,5 @@ export function Dashboard() {
         </div>
       )}
     </div>
-  )
+  );
 }
