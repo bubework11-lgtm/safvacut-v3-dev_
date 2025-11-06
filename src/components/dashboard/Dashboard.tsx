@@ -290,12 +290,11 @@ export function Dashboard() {
 
             <div className="bg-white p-6 rounded-xl flex items-center justify-center mb-4">
               <QRCodeSVG
-                value={profile.uid}
+                value={profile?.uid ?? ""}
                 size={200}
                 level="H"
                 includeMargin={true}
               />
-            </div>
 
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-center">
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
