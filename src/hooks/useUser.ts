@@ -26,53 +26,58 @@ export function useUser() {
 
   useEffect(() => {
     let mounted = true;
+    let listener: any = null; // ← Store listener here
 
     async function initSession() {
-      // Always start loading
       setUserData((prev) => ({ ...prev, loading: true }));
 
-      // 1️⃣ Try to get existing session (restored from localStorage)
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (session?.user) {
         await loadUserData(session.user);
-      } else {
-        // 2️⃣ If not ready, wait for auth state change event
-        const { data: listener } = supabase.auth.onAuthStateChange(
-          (_event, session) => {
-            if (session?.user) {
-              loadUserData(session.user);
-            } else {
-              if (mounted) {
-                setUserData({
-                  user: null,
-                  profile: null,
-                  loading: false,
-                  isAdmin: false,
-                });
-              }
-            }
-          },
-        );
-
-        return () => listener.subscription.unsubscribe();
       }
 
-      if (mounted) setUserData((prev) => ({ ...prev, loading: false }));
+      // ← MOVE LISTENER OUTSIDE initSession
+      const { data: authListener } = supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          if (!mounted) return;
+
+          if (session?.user) {
+            loadUserData(session.user);
+          } else {
+            setUserData({
+              user: null,
+              profile: null,
+              loading: false,
+              isAdmin: false,
+            });
+          }
+        },
+      );
+
+      listener = authListener; // ← Save reference
+
+      if (mounted) {
+        setUserData((prev) => ({ ...prev, loading: false }));
+      }
     }
 
     initSession();
 
     return () => {
       mounted = false;
+      if (listener?.subscription) {
+        listener.subscription.unsubscribe(); // ← Proper cleanup
+      }
     };
-  }, []);
+  }, []); // ← Only run once
 
   async function loadUserData(user: User) {
+    if (!mounted) return;
+
     try {
-      // Load or create profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
@@ -87,14 +92,12 @@ export function useUser() {
           .insert([{ id: user.id, email: user.email }])
           .select()
           .single();
-
         if (createError) throw createError;
         finalProfile = newProfile;
       } else if (profileError) {
         throw profileError;
       }
 
-      // Check admin status
       const { data: adminData } = await supabase
         .from("admins")
         .select("user_id")
