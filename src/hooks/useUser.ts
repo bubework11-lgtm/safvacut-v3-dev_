@@ -28,6 +28,49 @@ export function useUser() {
     let mounted = true;
     let unsubscribe: (() => void) | undefined = undefined;
 
+    // Define loadUserData INSIDE useEffect so it can see `mounted`
+    const loadUserData = async (user: User) => {
+      if (!mounted) return;
+
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        let finalProfile = profile;
+
+        if (profileError?.code === "PGRST116") {
+          const { data: newProfile, error: createError } = await supabase
+            .from("profiles")
+            .insert([{ id: user.id, email: user.email }])
+            .select()
+            .single();
+          if (createError) throw createError;
+          finalProfile = newProfile;
+        } else if (profileError) {
+          throw profileError;
+        }
+
+        const { data: adminData } = await supabase
+          .from("admins")
+          .select("user_id")
+          .eq("user_id", user.id)
+          .single();
+
+        setUserData({
+          user,
+          profile: finalProfile,
+          loading: false,
+          isAdmin: !!adminData,
+        });
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        setUserData({ user, profile: null, loading: false, isAdmin: false });
+      }
+    };
+
     const init = async () => {
       setUserData((prev) => ({ ...prev, loading: true }));
 
@@ -56,7 +99,6 @@ export function useUser() {
         },
       );
 
-      // Works for ALL Supabase versions
       const sub = listener?.subscription ?? listener;
       if (typeof sub?.unsubscribe === "function") {
         unsubscribe = sub.unsubscribe.bind(sub);
@@ -71,51 +113,9 @@ export function useUser() {
 
     return () => {
       mounted = false;
-      unsubscribe?.();
+      if (unsubscribe) unsubscribe();
     };
   }, []);
-
-  const loadUserData = async (user: User) => {
-    if (!mounted) return;
-
-    try {
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      let finalProfile = profile;
-
-      if (profileError?.code === "PGRST116") {
-        const { data: newProfile, error: createError } = await supabase
-          .from("profiles")
-          .insert([{ id: user.id, email: user.email }])
-          .select()
-          .single();
-        if (createError) throw createError;
-        finalProfile = newProfile;
-      } else if (profileError) {
-        throw profileError;
-      }
-
-      const { data: adminData } = await supabase
-        .from("admins")
-        .select("user_id")
-        .eq("user_id", user.id)
-        .single();
-
-      setUserData({
-        user,
-        profile: finalProfile,
-        loading: false,
-        isAdmin: !!adminData,
-      });
-    } catch (error) {
-      console.error("Error loading user data:", error);
-      setUserData({ user, profile: null, loading: false, isAdmin: false });
-    }
-  };
 
   return userData;
 }
