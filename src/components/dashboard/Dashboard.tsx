@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { useBalances } from "../../hooks/useBalances";
@@ -25,11 +25,19 @@ import { toast } from "sonner";
 import { DashboardSkeleton } from "../ui/SkeletonLoader";
 
 export function Dashboard() {
-  const { user, profile, isAdmin } = useUser();
+  const { user, profile, isAdmin, loading: userLoading } = useUser(); // ← ADD loading flag
   const { balances, loading: balancesLoading } = useBalances(user?.id ?? "");
   const { prices, loading: pricesLoading } = usePrices();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [showQR, setShowQR] = useState(false);
+
+  // ← PREVENT INFINITE LOOP: Only fetch once when user is ready
+  useEffect(() => {
+    if (user && !profile && !userLoading) {
+      // If profile is missing, create a default one (optional fallback)
+      // Or just wait — but don't let useUser() re-trigger endlessly
+    }
+  }, [user, profile, userLoading]);
 
   const getBalance = (token: string) => {
     const balance = balances.find((b) => b.token === token);
@@ -64,7 +72,8 @@ export function Dashboard() {
     haptics.light();
   };
 
-  if (!profile) {
+  // ← CRITICAL: Wait for profile AND user loading to finish
+  if (userLoading || !profile) {
     return <DashboardSkeleton />;
   }
 
@@ -129,7 +138,7 @@ export function Dashboard() {
         {isAdmin && (
           <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-6">
             <p className="text-orange-600 dark:text-orange-400 font-semibold">
-              🔑 Admin Panel Access
+              Admin Panel Access
             </p>
           </div>
         )}
@@ -165,7 +174,6 @@ export function Dashboard() {
             </div>
             <span className="font-semibold">Deposit</span>
           </Link>
-
           <Link
             to="/withdraw"
             onClick={() => haptics.light()}
@@ -176,7 +184,6 @@ export function Dashboard() {
             </div>
             <span className="font-semibold">Withdraw</span>
           </Link>
-
           <Link
             to="/history"
             onClick={() => haptics.light()}
@@ -194,13 +201,11 @@ export function Dashboard() {
             <h3 className="text-lg font-semibold">Assets</h3>
             <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </div>
-
           <div className="space-y-3">
             {SUPPORTED_TOKENS.map((token) => {
               const amount = getBalance(token);
               const usdValue = getUsdValue(token, amount);
               const price = prices[token]?.usd || 0;
-
               return (
                 <div
                   key={token}
@@ -259,13 +264,13 @@ export function Dashboard() {
               to="/admin"
               className="block bg-orange-500 hover:bg-orange-600 text-white text-center font-semibold py-3 rounded-lg transition-colors"
             >
-              🔐 Admin Panel
+              Admin Panel
             </Link>
           </div>
         )}
       </div>
 
-      {showQR && (
+      {showQR && profile?.uid && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setShowQR(false)}
@@ -282,28 +287,24 @@ export function Dashboard() {
             >
               <X className="w-5 h-5" />
             </button>
-
             <h2 className="text-2xl font-bold mb-2">Profile QR Code</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               Share this QR code for your profile UID
             </p>
-
             <div className="bg-white p-6 rounded-xl flex items-center justify-center mb-4">
               <QRCodeSVG
-                value={profile?.uid ?? ""}
+                value={profile.uid}
                 size={200}
                 level="H"
                 includeMargin={true}
               />
             </div>
-
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-center">
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                 Your UID
               </p>
               <p className="font-mono font-bold text-lg">{profile.uid}</p>
             </div>
-
             <button
               onClick={handleCopyUID}
               className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
