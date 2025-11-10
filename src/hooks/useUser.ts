@@ -26,7 +26,7 @@ export function useUser() {
 
   useEffect(() => {
     let mounted = true;
-    let unsubscribe: (() => void) | undefined;
+    let unsubscribe: (() => void) | undefined = undefined;
 
     const init = async () => {
       setUserData((prev) => ({ ...prev, loading: true }));
@@ -56,7 +56,7 @@ export function useUser() {
         },
       );
 
-      // Handle both old and new Supabase return formats
+      // Works for ALL Supabase versions
       const sub = listener?.subscription ?? listener;
       if (typeof sub?.unsubscribe === "function") {
         unsubscribe = sub.unsubscribe.bind(sub);
