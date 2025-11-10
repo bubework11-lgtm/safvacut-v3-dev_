@@ -26,9 +26,8 @@ export function useUser() {
 
   useEffect(() => {
     let mounted = true;
-    let subscription: any = null; // ← Correct name
 
-    async function initSession() {
+    const initSession = async () => {
       setUserData((prev) => ({ ...prev, loading: true }));
 
       const {
@@ -39,8 +38,8 @@ export function useUser() {
         await loadUserData(session.user);
       }
 
-      // ← FIXED: Correctly store subscription
-      const { data: authListener } = supabase.auth.onAuthStateChange(
+      // ← FINAL FIX: Handle both old & new Supabase return formats
+      const { data: listener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
           if (!mounted) return;
 
@@ -57,24 +56,28 @@ export function useUser() {
         },
       );
 
-      subscription = authListener.subscription; // ← This is the real subscription
+      // ← This works for ALL Supabase versions
+      const subscription = listener?.subscription || listener;
 
       if (mounted) {
         setUserData((prev) => ({ ...prev, loading: false }));
       }
-    }
 
-    initSession();
+      return () => {
+        mounted = false;
+        subscription?.unsubscribe?.();
+      };
+    };
+
+    const cleanup = initSession();
 
     return () => {
       mounted = false;
-      if (subscription?.unsubscribe) {
-        subscription.unsubscribe();
-      }
+      if (typeof cleanup === "function") cleanup();
     };
   }, []);
 
-  async function loadUserData(user: User) {
+  const loadUserData = async (user: User) => {
     if (!mounted) return;
 
     try {
@@ -86,7 +89,7 @@ export function useUser() {
 
       let finalProfile = profile;
 
-      if (profileError && profileError.code === "PGRST116") {
+      if (profileError?.code === "PGRST116") {
         const { data: newProfile, error: createError } = await supabase
           .from("profiles")
           .insert([{ id: user.id, email: user.email }])
@@ -114,7 +117,7 @@ export function useUser() {
       console.error("Error loading user data:", error);
       setUserData({ user, profile: null, loading: false, isAdmin: false });
     }
-  }
+  };
 
   return userData;
 }
