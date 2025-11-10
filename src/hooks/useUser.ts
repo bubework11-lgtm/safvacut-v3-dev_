@@ -26,7 +26,7 @@ export function useUser() {
 
   useEffect(() => {
     let mounted = true;
-    let listener: any = null; // ← Store listener here
+    let subscription: any = null; // ← Correct name
 
     async function initSession() {
       setUserData((prev) => ({ ...prev, loading: true }));
@@ -39,7 +39,7 @@ export function useUser() {
         await loadUserData(session.user);
       }
 
-      // ← MOVE LISTENER OUTSIDE initSession
+      // ← FIXED: Correctly store subscription
       const { data: authListener } = supabase.auth.onAuthStateChange(
         (_event, session) => {
           if (!mounted) return;
@@ -57,7 +57,7 @@ export function useUser() {
         },
       );
 
-      listener = authListener; // ← Save reference
+      subscription = authListener.subscription; // ← This is the real subscription
 
       if (mounted) {
         setUserData((prev) => ({ ...prev, loading: false }));
@@ -68,11 +68,11 @@ export function useUser() {
 
     return () => {
       mounted = false;
-      if (listener?.subscription) {
-        listener.subscription.unsubscribe(); // ← Proper cleanup
+      if (subscription?.unsubscribe) {
+        subscription.unsubscribe();
       }
     };
-  }, []); // ← Only run once
+  }, []);
 
   async function loadUserData(user: User) {
     if (!mounted) return;
