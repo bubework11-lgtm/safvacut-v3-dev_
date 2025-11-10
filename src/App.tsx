@@ -1,22 +1,21 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Toaster } from 'sonner'
-import { useUser } from './hooks/useUser'
-import { useRealtimeNotifications } from './hooks/useRealtimeNotifications'
-import { Login } from './components/auth/Login'
-import { Signup } from './components/auth/Signup'
-import { OnboardingCarousel } from './components/OnboardingCarousel'
-import { BiometricLogin } from './components/auth/BiometricLogin'
-import { Dashboard } from './components/dashboard/Dashboard'
-import { Deposit } from './components/wallet/Deposit'
-import { Withdraw } from './components/wallet/Withdraw'
-import { AdminPanel } from './components/admin/AdminPanel'
-import { UserList } from './components/admin/UserList'
-import { TransactionHistory } from './components/wallet/TransactionHistory'
-import ErrorBoundary from './components/ErrorBoundary'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { useUser } from "./hooks/useUser";
+import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
+import { Login } from "./components/auth/Login";
+import { Signup } from "./components/auth/Signup";
+import { OnboardingCarousel } from "./components/OnboardingCarousel";
+import { BiometricLogin } from "./components/auth/BiometricLogin";
+import { Dashboard } from "./components/dashboard/Dashboard";
+import { Deposit } from "./components/wallet/Deposit";
+import { Withdraw } from "./components/wallet/Withdraw";
+import { AdminPanel } from "./components/admin/AdminPanel";
+import { UserList } from "./components/admin/UserList";
+import { TransactionHistory } from "./components/wallet/TransactionHistory";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useUser()
-
+  const { user, loading } = useUser();
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -25,19 +24,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
-
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
-
-  return <>{children}</>
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{children}</>;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading, isAdmin } = useUser()
-
+  const { user, loading, isAdmin } = useUser();
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -46,18 +40,11 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
-
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
-
-  if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />
-  }
-
-  return <>{children}</>
+  if (!user) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
 }
 
 function LoginWithBiometric() {
@@ -68,12 +55,12 @@ function LoginWithBiometric() {
         <BiometricLogin />
       </div>
     </div>
-  )
+  );
 }
 
 function App() {
-  const { user } = useUser()
-  useRealtimeNotifications(user?.id)
+  const { user } = useUser();
+  useRealtimeNotifications(user?.id);
 
   return (
     <ErrorBoundary>
@@ -135,7 +122,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </ErrorBoundary>
-  )
+  );
 }
 
-export default App
+export default App;
