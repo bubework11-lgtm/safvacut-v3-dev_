@@ -5,26 +5,23 @@ import App from "./App.tsx";
 import { DarkModeProvider } from "./contexts/DarkModeContext";
 import { supabase } from "./lib/supabase";
 
-async function enableMocking() {
-  if (import.meta.env.DEV) {
-    const { worker } = await import("./mocks/browser");
-    return worker.start();
-  }
-  return Promise.resolve();
+// ONLY enable mocking in development AND if the file exists
+if (import.meta.env.DEV) {
+  import("./mocks/browser")
+    .then(({ worker }) => worker.start())
+    .catch(() => console.log("MSW not available - skipping mock"));
 }
 
-enableMocking().then(() => {
-  // Wait for Supabase to know if user is logged in
-  supabase.auth.getSession().then(() => {
-    const root = document.getElementById("root");
-    if (root) {
-      createRoot(root).render(
-        <StrictMode>
-          <DarkModeProvider>
-            <App />
-          </DarkModeProvider>
-        </StrictMode>,
-      );
-    }
-  });
+// Wait for Supabase session BEFORE rendering
+supabase.auth.getSession().then(() => {
+  const root = document.getElementById("root");
+  if (root) {
+    createRoot(root).render(
+      <StrictMode>
+        <DarkModeProvider>
+          <App />
+        </DarkModeProvider>
+      </StrictMode>,
+    );
+  }
 });
