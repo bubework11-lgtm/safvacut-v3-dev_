@@ -26,8 +26,9 @@ export function useUser() {
 
   useEffect(() => {
     let mounted = true;
+    let unsubscribe: (() => void) | undefined;
 
-    const initSession = async () => {
+    const init = async () => {
       setUserData((prev) => ({ ...prev, loading: true }));
 
       const {
@@ -38,13 +39,12 @@ export function useUser() {
         await loadUserData(session.user);
       }
 
-      // ← FINAL FIX: Handle both old & new Supabase return formats
       const { data: listener } = supabase.auth.onAuthStateChange(
-        (_event, session) => {
+        async (_event, session) => {
           if (!mounted) return;
 
           if (session?.user) {
-            loadUserData(session.user);
+            await loadUserData(session.user);
           } else {
             setUserData({
               user: null,
@@ -56,24 +56,22 @@ export function useUser() {
         },
       );
 
-      // ← This works for ALL Supabase versions
-      const subscription = listener?.subscription || listener;
+      // Handle both old and new Supabase return formats
+      const sub = listener?.subscription ?? listener;
+      if (typeof sub?.unsubscribe === "function") {
+        unsubscribe = sub.unsubscribe.bind(sub);
+      }
 
       if (mounted) {
         setUserData((prev) => ({ ...prev, loading: false }));
       }
-
-      return () => {
-        mounted = false;
-        subscription?.unsubscribe?.();
-      };
     };
 
-    const cleanup = initSession();
+    init();
 
     return () => {
       mounted = false;
-      if (typeof cleanup === "function") cleanup();
+      unsubscribe?.();
     };
   }, []);
 
