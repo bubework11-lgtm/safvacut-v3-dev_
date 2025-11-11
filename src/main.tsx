@@ -5,23 +5,19 @@ import App from "./App.tsx";
 import { DarkModeProvider } from "./contexts/DarkModeContext";
 import { supabase } from "./lib/supabase";
 
-// ONLY TRY TO LOAD MSW IN DEV — AND IF IT FAILS, WE DON'T CARE
-if (import.meta.env.DEV) {
-  import("./mocks/browser")
-    .then(({ worker }) => worker.start())
-    .catch(() => null); // ← SILENTLY IGNORE IF FILE DOESN'T EXIST
-}
+// NO MSW. NO MOCKS. NO IMPORTS. NO ERRORS.
+// MSW belongs in vite.config.ts or setupTests.ts — NOT main.tsx
 
-// THIS IS THE REAL FIX — WAIT FOR SUPABASE SESSION
+// Wait for Supabase session — this fixes #311 hydration error
 supabase.auth.getSession().then(() => {
-  const rootElement = document.getElementById("root");
-  if (!rootElement) return;
-
-  createRoot(rootElement).render(
-    <StrictMode>
-      <DarkModeProvider>
-        <App />
-      </DarkModeProvider>
-    </StrictMode>,
-  );
+  const root = document.getElementById("root");
+  if (root) {
+    createRoot(root).render(
+      <StrictMode>
+        <DarkModeProvider>
+          <App />
+        </DarkModeProvider>
+      </StrictMode>,
+    );
+  }
 });
