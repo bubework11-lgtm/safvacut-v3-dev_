@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { useBalances } from "../../hooks/useBalances";
@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   ArrowDownLeft,
+  RefreshCw,
   LogOut,
   Moon,
   Sun,
@@ -29,6 +30,12 @@ export function Dashboard() {
   const { prices, loading: pricesLoading } = usePrices();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [showQR, setShowQR] = useState(false);
+
+  useEffect(() => {
+    if (user && !profile && !userLoading) {
+      // Optional fallback
+    }
+  }, [user, profile, userLoading]);
 
   const getBalance = (token: string) => {
     const balance = balances.find((b) => b.token === token);
@@ -84,12 +91,16 @@ export function Dashboard() {
                 <button
                   onClick={handleCopyUID}
                   className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                  aria-label="Copy UID"
+                  title="Copy UID"
                 >
                   <Copy className="w-3 h-3 text-gray-500 dark:text-gray-400" />
                 </button>
                 <button
                   onClick={handleShowQR}
                   className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                  aria-label="Show QR Code"
+                  title="Show Profile QR"
                 >
                   <QrCode className="w-3 h-3 text-gray-500 dark:text-gray-400" />
                 </button>
@@ -98,8 +109,12 @@ export function Dashboard() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={toggleDarkMode}
+              onClick={() => {
+                haptics.light();
+                toggleDarkMode();
+              }}
               className="p-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              aria-label="Toggle dark mode"
             >
               {darkMode ? (
                 <Sun className="w-5 h-5" />
@@ -119,7 +134,7 @@ export function Dashboard() {
         {isAdmin && (
           <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-6">
             <p className="text-orange-600 dark:text-orange-400 font-semibold">
-              Admin Panel Access
+              🔑 Admin Panel Access
             </p>
           </div>
         )}
@@ -178,7 +193,10 @@ export function Dashboard() {
         </div>
 
         <div className="bg-gray-200 dark:bg-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Assets</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Assets</h3>
+            <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </div>
           <div className="space-y-3">
             {SUPPORTED_TOKENS.map((token) => {
               const amount = getBalance(token);
@@ -190,7 +208,7 @@ export function Dashboard() {
                   className="bg-gray-100 dark:bg-gray-900/50 rounded-lg p-4 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center font-bold text-white">
+                    <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center font-bold">
                       {token.slice(0, 2)}
                     </div>
                     <div>
@@ -242,7 +260,7 @@ export function Dashboard() {
               to="/admin"
               className="block bg-orange-500 hover:bg-orange-600 text-white text-center font-semibold py-3 rounded-lg transition-colors"
             >
-              Admin Panel
+              🔐 Admin Panel
             </Link>
           </div>
         )}
@@ -274,7 +292,7 @@ export function Dashboard() {
                 value={profile.uid}
                 size={200}
                 level="H"
-                includeMargin={true}
+                marginSize={4}
               />
             </div>
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-center">
