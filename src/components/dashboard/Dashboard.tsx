@@ -70,7 +70,6 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-black text-gray-900 dark:text-white transition-colors">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* HEADER */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <img
@@ -117,7 +116,6 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* ADMIN BANNER */}
         {isAdmin && (
           <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-6">
             <p className="text-orange-600 dark:text-orange-400 font-semibold">
@@ -126,7 +124,6 @@ export function Dashboard() {
           </div>
         )}
 
-        {/* PORTFOLIO VALUE */}
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 mb-6 shadow-xl">
           <p className="text-orange-100 text-sm mb-2">Total Portfolio Value</p>
           {balancesLoading || pricesLoading ? (
@@ -147,7 +144,6 @@ export function Dashboard() {
           )}
         </div>
 
-        {/* QUICK ACTIONS */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           <Link
             to="/deposit"
@@ -181,7 +177,6 @@ export function Dashboard() {
           </Link>
         </div>
 
-        {/* ASSETS */}
         <div className="bg-gray-200 dark:bg-gray-800 rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Assets</h3>
           <div className="space-y-3">
@@ -221,7 +216,7 @@ export function Dashboard() {
                           className="font-semibold"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          key={amount} // ← FIXED: was 'skrz'
+                          key={amount}
                         >
                           {amount.toFixed(8)} {token}
                         </motion.p>
@@ -241,7 +236,6 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* ADMIN LINK */}
         {isAdmin && (
           <div className="mt-6">
             <Link
@@ -254,7 +248,6 @@ export function Dashboard() {
         )}
       </div>
 
-      {/* QR MODAL */}
       {showQR && profile?.uid && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -281,9 +274,7 @@ export function Dashboard() {
                 value={profile.uid}
                 size={200}
                 level="H"
-                includeMargin={true} // ← Deprecated but still works
-                // Use this instead if you want to avoid warning:
-                // marginSize={4}
+                includeMargin={true}
               />
             </div>
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 text-center">
