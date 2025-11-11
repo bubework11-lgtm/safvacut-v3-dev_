@@ -1,51 +1,18 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "sonner";
-import { useUser } from "./hooks/useUser";
-// import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
-import { Login } from "./components/auth/Login";
-import { Signup } from "./components/auth/Signup";
-import { OnboardingCarousel } from "./components/OnboardingCarousel";
-import { BiometricLogin } from "./components/auth/BiometricLogin";
-import { Dashboard } from "./components/dashboard/Dashboard";
-import { Deposit } from "./components/wallet/Deposit";
-import { Withdraw } from "./components/wallet/Withdraw";
-import { AdminPanel } from "./components/admin/AdminPanel";
-import { UserList } from "./components/admin/UserList";
-import { TransactionHistory } from "./components/wallet/TransactionHistory";
-import ErrorBoundary from "./components/ErrorBoundary";
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useUser();
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-indigo-100 dark:from-gray-900 dark:to-black">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/login" replace />;
-  return <>{children}</>;
-}
-
-function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading, isAdmin } = useUser();
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-indigo-100 dark:from-gray-900 dark:to-black">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/login" replace />;
-  if (!isAdmin) return <Navigate to="/dashboard" replace />;
-  return <>{children}</>;
-}
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { Toaster } from "sonner"
+import { Login } from "./components/auth/Login"
+import { Signup } from "./components/auth/Signup"
+import { OnboardingCarousel } from "./components/OnboardingCarousel"
+import { BiometricLogin } from "./components/auth/BiometricLogin"
+import { Dashboard } from "./components/dashboard/Dashboard"
+import { Deposit } from "./components/wallet/Deposit"
+import { Withdraw } from "./components/wallet/Withdraw"
+import { AdminPanel } from "./components/admin/AdminPanel"
+import { UserList } from "./components/admin/UserList"
+import { TransactionHistory } from "./components/wallet/TransactionHistory"
+import ErrorBoundary from "./components/ErrorBoundary"
+import { ProtectedRoute } from "./components/ProtectedRoute"
+import { AdminRoute } from "./components/AdminRoute"
 
 function LoginWithBiometric() {
   return (
@@ -55,11 +22,10 @@ function LoginWithBiometric() {
         <BiometricLogin />
       </div>
     </div>
-  );
+  )
 }
 
 function App() {
-  // NO useUser() HERE — LET PROTECTEDROUTE HANDLE IT
   return (
     <ErrorBoundary>
       <BrowserRouter>
@@ -68,59 +34,17 @@ function App() {
           <Route path="/" element={<OnboardingCarousel />} />
           <Route path="/login" element={<LoginWithBiometric />} />
           <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/deposit"
-            element={
-              <ProtectedRoute>
-                <Deposit />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/withdraw"
-            element={
-              <ProtectedRoute>
-                <Withdraw />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/history"
-            element={
-              <ProtectedRoute>
-                <TransactionHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminPanel />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <AdminRoute>
-                <UserList />
-              </AdminRoute>
-            }
-          />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/deposit" element={<ProtectedRoute><Deposit /></ProtectedRoute>} />
+          <Route path="/withdraw" element={<ProtectedRoute><Withdraw /></ProtectedRoute>} />
+          <Route path="/history" element={<ProtectedRoute><TransactionHistory /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          <Route path="/admin/users" element={<AdminRoute><UserList /></AdminRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </ErrorBoundary>
-  );
+  )
 }
 
-export default App;
+export default App
