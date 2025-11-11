@@ -5,23 +5,23 @@ import App from "./App.tsx";
 import { DarkModeProvider } from "./contexts/DarkModeContext";
 import { supabase } from "./lib/supabase";
 
-// ONLY enable mocking in development AND if the file exists
+// ONLY TRY TO LOAD MSW IN DEV — AND IF IT FAILS, WE DON'T CARE
 if (import.meta.env.DEV) {
   import("./mocks/browser")
     .then(({ worker }) => worker.start())
-    .catch(() => console.log("MSW not available - skipping mock"));
+    .catch(() => null); // ← SILENTLY IGNORE IF FILE DOESN'T EXIST
 }
 
-// Wait for Supabase session BEFORE rendering
+// THIS IS THE REAL FIX — WAIT FOR SUPABASE SESSION
 supabase.auth.getSession().then(() => {
-  const root = document.getElementById("root");
-  if (root) {
-    createRoot(root).render(
-      <StrictMode>
-        <DarkModeProvider>
-          <App />
-        </DarkModeProvider>
-      </StrictMode>,
-    );
-  }
+  const rootElement = document.getElementById("root");
+  if (!rootElement) return;
+
+  createRoot(rootElement).render(
+    <StrictMode>
+      <DarkModeProvider>
+        <App />
+      </DarkModeProvider>
+    </StrictMode>,
+  );
 });
