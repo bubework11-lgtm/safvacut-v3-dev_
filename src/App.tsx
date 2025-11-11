@@ -11,8 +11,7 @@ import { AdminPanel } from "./components/admin/AdminPanel"
 import { UserList } from "./components/admin/UserList"
 import { TransactionHistory } from "./components/wallet/TransactionHistory"
 import ErrorBoundary from "./components/ErrorBoundary"
-import { ProtectedRoute } from "./components/ProtectedRoute"
-import { AdminRoute } from "./components/AdminRoute"
+import { ProtectedLayout } from "./components/ProtectedLayout"
 
 function LoginWithBiometric() {
   return (
@@ -34,12 +33,16 @@ function App() {
           <Route path="/" element={<OnboardingCarousel />} />
           <Route path="/login" element={<LoginWithBiometric />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/deposit" element={<ProtectedRoute><Deposit /></ProtectedRoute>} />
-          <Route path="/withdraw" element={<ProtectedRoute><Withdraw /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><TransactionHistory /></ProtectedRoute>} />
-          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-          <Route path="/admin/users" element={<AdminRoute><UserList /></AdminRoute>} />
+
+          <Route element={<ProtectedLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/deposit" element={<Deposit />} />
+            <Route path="/withdraw" element={<Withdraw />} />
+            <Route path="/history" element={<TransactionHistory />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/users" element={<UserList />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
