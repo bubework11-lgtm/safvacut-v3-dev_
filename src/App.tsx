@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { useUser } from "./hooks/useUser";
-import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
+// import { useRealtimeNotifications } from "./hooks/useRealtimeNotifications";
 import { Login } from "./components/auth/Login";
 import { Signup } from "./components/auth/Signup";
 import { OnboardingCarousel } from "./components/OnboardingCarousel";
@@ -59,9 +59,7 @@ function LoginWithBiometric() {
 }
 
 function App() {
-  // DO NOT CALL useUser() HERE
-  // useRealtimeNotifications(undefined) // remove if not needed
-
+  // NO useUser() HERE — LET PROTECTEDROUTE HANDLE IT
   return (
     <ErrorBoundary>
       <BrowserRouter>
